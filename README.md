@@ -1,6 +1,20 @@
 # 4203-Intrusion-Detection-Project
 
-Steps:
+**Presentation Video**
+https://youtu.be/X9NMJFhzqqQ 
+
+**Refferenced Paper**
+Satam, & Hariri, S. (2021). WIDS: An Anomaly Based Intrusion Detection System for Wi-Fi (IEEE 802.11) Protocol. IEEE eTransactions on Network and Service Management, 18(1), 1077–1091. https://doi.org/10.1109/TNSM.2020.3036138
+
+**Other Links**
+* https://www.tensorflow.org/ 
+* https://keras.io/about/ 
+* https://numpy.org/ 
+* https://www.wireshark.org/ 
+* https://github.com/KimiNewt/pyshark/ 
+* https://matplotlib.org/ 
+
+**Steps:**
 
 1. Gather data frames to be used to train the network\
   1.1. Using WireShark or pyshark to capture normal and abnormal activity on a network\
