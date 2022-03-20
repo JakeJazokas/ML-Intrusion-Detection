@@ -1,9 +1,9 @@
 # 4203-Intrusion-Detection-Project
 
-**Presentation Video**
+**Presentation Video**\
 https://youtu.be/X9NMJFhzqqQ 
 
-**Refferenced Paper**
+**Refferenced Paper**\
 Satam, & Hariri, S. (2021). WIDS: An Anomaly Based Intrusion Detection System for Wi-Fi (IEEE 802.11) Protocol. IEEE eTransactions on Network and Service Management, 18(1), 1077–1091. https://doi.org/10.1109/TNSM.2020.3036138
 
 **Other Links**
