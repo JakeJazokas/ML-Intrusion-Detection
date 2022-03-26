@@ -14,6 +14,10 @@ Satam, & Hariri, S. (2021). WIDS: An Anomaly Based Intrusion Detection System fo
 * https://github.com/KimiNewt/pyshark/ 
 * https://matplotlib.org/ 
 
+**Wireshark Cheatsheets**
+* https://semfionetworks.com/wp-content/uploads/2021/04/wireshark_802.11_filters_-_reference_sheet.pdf
+* https://www.wireshark.org/docs/dfref/f/frame.html
+
 **Steps:**
 
 1. Gather data frames to be used to train the network\
