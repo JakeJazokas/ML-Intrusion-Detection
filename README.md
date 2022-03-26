@@ -18,6 +18,14 @@ Satam, & Hariri, S. (2021). WIDS: An Anomaly Based Intrusion Detection System fo
 * https://semfionetworks.com/wp-content/uploads/2021/04/wireshark_802.11_filters_-_reference_sheet.pdf
 * https://www.wireshark.org/docs/dfref/f/frame.html
 
+**Datasets**
+* https://www.unb.ca/cic/datasets/ids-2017.html
+* https://ocslab.hksecurity.net/Datasets/iot-network-intrusion-dataset
+
+**Related Github Projects**
+* https://github.com/Western-OC2-Lab/Intrusion-Detection-System-Using-Machine-Learning/blob/main/MTH_IDS_IoTJ.ipynb
+* https://github.com/shibha20/Intrusion-Detection-in-Wireless-Network
+
 **Steps:**
 
 1. Gather data frames to be used to train the network\
