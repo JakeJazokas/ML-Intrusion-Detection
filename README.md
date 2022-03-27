@@ -26,7 +26,9 @@ Satam, & Hariri, S. (2021). WIDS: An Anomaly Based Intrusion Detection System fo
 * https://github.com/Western-OC2-Lab/Intrusion-Detection-System-Using-Machine-Learning/blob/main/MTH_IDS_IoTJ.ipynb
 * ~~https://github.com/shibha20/Intrusion-Detection-in-Wireless-Network~~ [REMOVED]
 * https://github.com/kahramankostas/Anomaly-Detection-in-Networks-Using-Machine-Learning
+* https://github.com/Bee-Mar/AWID-Intrusion-Detection
 * https://github.com/ymirsky/Kitsune-py
+* https://github.com/vinayakumarr/Network-Intrusion-Detection
 
 **Attack Generation**
 * https://github.com/tklab-tud/ID2T
