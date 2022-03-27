@@ -3,6 +3,7 @@
 # 1) Flow Probability - Jelinek-Mercer smoothing model - (Lambda = 0.5)
 def calculate_flow_probability(n_gram, n_gram_flow):
     # TODO Determine P(n_gram|n_gram_flow)
+    # Maybe a useful link: https://github.com/scikit-learn/scikit-learn/issues/12862
     return
 
 # 2) Total Frames in Flow (Each n-gram flow is made up of 4 frames)
