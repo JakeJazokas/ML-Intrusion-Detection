@@ -145,7 +145,11 @@ def create_n_grams_from_observed_features(features):
             all_n_grams.append(four_gram_pattern)
             four_gram_pattern = []
             pattern_length = 0
-    return(np.asarray(all_n_grams)) 
+    return(np.asarray(all_n_grams))
+
+def extract_feature_set_from_live_capture():
+    # TODO finish this for live captures
+    return
 
 f = extract_feature_set_from_capture('Wireshark_802_11.pcap')
 n = create_n_grams_from_observed_features(f)
