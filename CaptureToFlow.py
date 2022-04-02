@@ -1,67 +1,133 @@
 import pyshark
+import time
 import numpy as np
 
-def extract_feature_set_from_capture(captrue_path):
+def extract_feature_set_from_capture_path(captrue_path):
     captrue_array = pyshark.FileCapture(captrue_path)
     feature_set = np.empty(shape=(0,6))
     # print(dir(captrue_array[1]['wlan']))
     # print(captrue_array[1]['wlan']._all_fields)
     for capture in captrue_array:
         # print(capture)
-        capture_fields = capture.wlan._all_fields
-        if(capture_fields['wlan.fc.type_subtype'] == '29'):
-            # No src address for an ACK frame only dst
-            # We want to include this in the n-gram
-            feature_array = []
-            # Epoch time
-            feature_array.append(capture.frame_info.time_epoch)
-            # Source = none
-            feature_array.append(None)
-            # Recieve = dst address
-            feature_array.append(capture_fields['wlan.ra'])
-            # Frame type
-            feature_array.append(capture_fields['wlan.fc.type'])
-            # Frame subtype
-            feature_array.append(capture_fields['wlan.fc.subtype'])
-            # Hash the type and subtype togeather
-            feature_array.append(capture_fields['wlan.fc.type_subtype'])
-            # Add to total numpy array
-            feature_set = np.vstack((feature_set, feature_array))
-        elif(capture_fields['wlan.fc.type_subtype'] == '33'):
-            # Malformed packet, retransmission nessicary
-            # We don't care about these
-            continue
-        elif(capture_fields['wlan.fc.type_subtype'] == '49'):
-            # Fragmented frame, contains data
-            # We don't care about these currently, but we might need to
-            continue
-        elif(capture_fields['wlan.fc.type_subtype'] == '59' or capture_fields['wlan.fc.type_subtype'] == '51'
-                or capture_fields['wlan.fc.type_subtype'] == '57' or capture_fields['wlan.fc.type_subtype'] == '55'):
-            # Unrecognized frame
-            # We don't care about these
-            continue
-        elif(capture_fields['wlan.fc.type_subtype'] == '28'):
-            # CTS/Clear to send frame
-            # We don't care about these currently, but we might need to
-            continue
-        else:
-            feature_array = []
-            # Epoch time
-            feature_array.append(capture.frame_info.time_epoch)
-            # Transmit = src address
-            feature_array.append(capture_fields['wlan.ta'])
-            # Recieve = dst address
-            feature_array.append(capture_fields['wlan.ra'])
-            # Frame type
-            feature_array.append(capture_fields['wlan.fc.type'])
-            # Frame subtype
-            feature_array.append(capture_fields['wlan.fc.subtype'])
-            # Hash the type and subtype togeather
-            feature_array.append(capture_fields['wlan.fc.type_subtype'])
-            # Add to total numpy array
-            feature_set = np.vstack((feature_set, feature_array))
+        if 'WLAN' in capture:
+            capture_fields = capture.wlan._all_fields
+            if(capture_fields['wlan.fc.type_subtype'] == '29'):
+                # No src address for an ACK frame only dst
+                # We want to include this in the n-gram
+                feature_array = []
+                # Epoch time
+                feature_array.append(capture.frame_info.time_epoch)
+                # Source = none
+                feature_array.append(None)
+                # Recieve = dst address
+                feature_array.append(capture_fields['wlan.ra'])
+                # Frame type
+                feature_array.append(capture_fields['wlan.fc.type'])
+                # Frame subtype
+                feature_array.append(capture_fields['wlan.fc.subtype'])
+                # Hash the type and subtype togeather
+                feature_array.append(capture_fields['wlan.fc.type_subtype'])
+                # Add to total numpy array
+                feature_set = np.vstack((feature_set, feature_array))
+            elif(capture_fields['wlan.fc.type_subtype'] == '33'):
+                # Malformed packet, retransmission nessicary
+                # We don't care about these
+                continue
+            elif(capture_fields['wlan.fc.type_subtype'] == '49'):
+                # Fragmented frame, contains data
+                # We don't care about these currently, but we might need to
+                continue
+            elif(capture_fields['wlan.fc.type_subtype'] == '59' or capture_fields['wlan.fc.type_subtype'] == '51'
+                    or capture_fields['wlan.fc.type_subtype'] == '57' or capture_fields['wlan.fc.type_subtype'] == '55'):
+                # Unrecognized frame
+                # We don't care about these
+                continue
+            elif(capture_fields['wlan.fc.type_subtype'] == '28'):
+                # CTS/Clear to send frame
+                # We don't care about these currently, but we might need to
+                continue
+            else:
+                feature_array = []
+                # Epoch time
+                feature_array.append(capture.frame_info.time_epoch)
+                # Transmit = src address
+                feature_array.append(capture_fields['wlan.ta'])
+                # Recieve = dst address
+                feature_array.append(capture_fields['wlan.ra'])
+                # Frame type
+                feature_array.append(capture_fields['wlan.fc.type'])
+                # Frame subtype
+                feature_array.append(capture_fields['wlan.fc.subtype'])
+                # Hash the type and subtype togeather
+                feature_array.append(capture_fields['wlan.fc.type_subtype'])
+                # Add to total numpy array
+                feature_set = np.vstack((feature_set, feature_array))
     captrue_array.close()
     # print(feature_set)
+    return(feature_set)
+
+def extract_feature_set_from_capture(captrue):
+    feature_set = np.empty(shape=(0,6))
+
+    # with open('output.txt', 'w') as f:
+    #     for x in captrue:
+    #         f.write(str(x))
+
+    for i in range(len(captrue)):
+        if 'WLAN' in captrue[i]:
+            print(captrue[i])
+            capture_fields = captrue[i].wlan._all_fields
+            if(capture_fields['wlan.fc.type_subtype'] == '29'):
+                # No src address for an ACK frame only dst
+                # We want to include this in the n-gram
+                feature_array = []
+                # Epoch time
+                feature_array.append(captrue[i].frame_info.time_epoch)
+                # Source = none
+                feature_array.append(None)
+                # Recieve = dst address
+                feature_array.append(capture_fields['wlan.ra'])
+                # Frame type
+                feature_array.append(capture_fields['wlan.fc.type'])
+                # Frame subtype
+                feature_array.append(capture_fields['wlan.fc.subtype'])
+                # Hash the type and subtype togeather
+                feature_array.append(capture_fields['wlan.fc.type_subtype'])
+                # Add to total numpy array
+                feature_set = np.vstack((feature_set, feature_array))
+            elif(capture_fields['wlan.fc.type_subtype'] == '33'):
+                # Malformed packet, retransmission nessicary
+                # We don't care about these
+                continue
+            elif(capture_fields['wlan.fc.type_subtype'] == '49'):
+                # Fragmented frame, contains data
+                # We don't care about these currently, but we might need to
+                continue
+            elif(capture_fields['wlan.fc.type_subtype'] == '59' or capture_fields['wlan.fc.type_subtype'] == '51'
+                    or capture_fields['wlan.fc.type_subtype'] == '57' or capture_fields['wlan.fc.type_subtype'] == '55'):
+                # Unrecognized frame
+                # We don't care about these
+                continue
+            elif(capture_fields['wlan.fc.type_subtype'] == '28'):
+                # CTS/Clear to send frame
+                # We don't care about these currently, but we might need to
+                continue
+            else:
+                feature_array = []
+                # Epoch time
+                feature_array.append(captrue[i].frame_info.time_epoch)
+                # Transmit = src address
+                feature_array.append(capture_fields['wlan.ta'])
+                # Recieve = dst address
+                feature_array.append(capture_fields['wlan.ra'])
+                # Frame type
+                feature_array.append(capture_fields['wlan.fc.type'])
+                # Frame subtype
+                feature_array.append(capture_fields['wlan.fc.subtype'])
+                # Hash the type and subtype togeather
+                feature_array.append(capture_fields['wlan.fc.type_subtype'])
+                # Add to total numpy array
+                feature_set = np.vstack((feature_set, feature_array))
     return(feature_set)
 
 def create_n_grams_from_observed_features(features):
@@ -147,10 +213,47 @@ def create_n_grams_from_observed_features(features):
             pattern_length = 0
     return(np.asarray(all_n_grams))
 
-def extract_feature_set_from_live_capture():
-    # TODO finish this for live captures
+def extract_feature_set_from_live_capture(timeout):
+    # TODO Update to use Wi-Fi and Monitor mode
+    capture = pyshark.LiveCapture(interface='eth', monitor_mode=True) # Capture on given interfaces # NEED MONITOR MODE
+    capture.set_debug()
+    capture.sniff(timeout=timeout)
+    capture.close()
+    return extract_feature_set_from_capture(capture)
+
+def extract_feature_set_from_live_capture_to_file(output_path, interface_name, timeout):
+    # TODO Update to use Wi-Fi and Monitor mode
+    capture = pyshark.LiveCapture(interface='eth', output_file=output_path) # Capture on given interfaces to the given path
+    count = 0
+    start = time.time()
+    capture.set_debug()
+    # for item in capture.sniff_continuously():
+        # # print(item)
+        # if timeout and time.time() - start > timeout:
+        #     break
+    # Create a capture file with n observations, each taking 10 seconds
+    # while count < iterations:
+    capture.sniff(timeout=10) # Capture for 10 Seconds
+        # count += 1# Increase count
+    # Try to close the file and return if succesful
+    # try:
+    #     capture.close()
+    # except:
+    #     return False
+    # return True
+    # capture.clear()
+    print(capture[-1])
+    capture.close()
     return
 
-f = extract_feature_set_from_capture('Wireshark_802_11.pcap')
-n = create_n_grams_from_observed_features(f)
-print(n)
+# f = extract_feature_set_from_capture('Wireshark_802_11.pcap')
+# n = create_n_grams_from_observed_features(f)
+# print(n)
+
+# Change the interface before use
+# extract_feature_set_from_live_capture_to_file('TestCap.pcap', r'\\Device\\NPF_{8615F95B-43AB-4DB1-A4FF-35172DFE1D57}', 10)
+f2 = extract_feature_set_from_live_capture(10)
+# Extract and return the feature set from the capture
+# f2 = extract_feature_set_from_capture('TestCap.pcap')
+n2 = create_n_grams_from_observed_features(f2)
+print(n2)
