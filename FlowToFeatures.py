@@ -1,10 +1,13 @@
+from cProfile import label
+from sklearn.naive_bayes import BernoulliNB
+from CaptureToFlow import CaptureToFlow
 # Features used to build the model
 
 # 1) Flow Probability - Jelinek-Mercer smoothing model - (Lambda = 0.5)
 def calculate_flow_probability(n_gram, n_gram_flow):
     # TODO Determine P(n_gram|n_gram_flow)
     # Maybe a useful link: https://github.com/scikit-learn/scikit-learn/issues/12862
-    return
+    return 1
 
 # 2) Total Frames in Flow (Each n-gram flow is made up of 4 frames)
 def calculate_total_frames_in_flow(n_gram_flow):
@@ -40,3 +43,13 @@ def calculate_data_frames_in_flow(n_gram_flow):
             if(frame[3] == '2'):
                 data_frame_counter += 1
     return(data_frame_counter/calculate_total_frames_in_flow(n_gram_flow))
+
+if __name__ == "__main__":
+    featureFlow = CaptureToFlow().extract_feature_set_from_capture_path('Wireshark_802_11.pcap')
+    hahsedFeatureFlow = CaptureToFlow().hash_observation_features(featureFlow)
+
+    # f = extract_feature_set_from_capture('Wireshark_802_11.pcap')
+    # n = create_n_grams_from_observed_features(f)
+    # print(n)
+    # print(hahsedFeatureFlow)
+    # print(calculate_flow_probability(featureFlow[0], featureFlow))
