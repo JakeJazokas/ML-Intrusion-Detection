@@ -3,6 +3,7 @@ from CaptureToFlow import CaptureToFlow
 from numpy import genfromtxt
 import numpy as np
 import pandas as pd
+import os
 '''
 Initial input is a stream of data frames
 
@@ -122,6 +123,12 @@ def train_network_from_classified_flows(classified_n_gram_flows, n_gram_flow_lab
     history = model.fit(classified_n_gram_flows, n_gram_flow_labels)
     # print(history)
     # print(model.predict(test_ngram))
+
+    model_f = open('model_save.pkl', w)
+    import pickle
+    if not os.path.exists('model_save.pkl'):
+        with open('model_save.pkl', 'wb') as f:
+    pickle.dump(model, f)
 
     
 # get_custom_data_from_dataset()
