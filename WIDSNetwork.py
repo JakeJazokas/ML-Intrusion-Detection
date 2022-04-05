@@ -1,9 +1,10 @@
 from sklearn.ensemble import AdaBoostClassifier
 from CaptureToFlow import CaptureToFlow
-from numpy import genfromtxt
 import numpy as np
 import pandas as pd
 import os
+import pickle
+from CaptureToFlow import CaptureToFlow
 '''
 Initial input is a stream of data frames
 
@@ -120,21 +121,30 @@ def train_network_from_classified_flows(classified_n_gram_flows, n_gram_flow_lab
     # test_ngram = np.array(classified_n_gram_flows)[0].reshape(1, 6*4)
     # print(test_ngram)
     classified_n_gram_flows = np.array(classified_n_gram_flows).reshape(9821, 6*4)
-    history = model.fit(classified_n_gram_flows, n_gram_flow_labels)
+    model.fit(classified_n_gram_flows, n_gram_flow_labels)
     # print(history)
     # print(model.predict(test_ngram))
+    if not os.path.exists('smallDsModel.pkl'):
+        with open('smallDsModel.pkl', 'wb') as f:
+            pickle.dump(model, f)
 
-    model_f = open('model_save.pkl', w)
-    import pickle
-    if not os.path.exists('model_save.pkl'):
-        with open('model_save.pkl', 'wb') as f:
-    pickle.dump(model, f)
+def used_trained_model_to_predit_flow(model_path, n_gram_flows):
+    model = pickle.load(open(model_path, 'rb'))
+    predictions = model.predict(n_gram_flows)
+    return(predictions)
 
-    
-# get_custom_data_from_dataset()
-x, y = get_n_grams_from_custom_dataset()
-train_network_from_classified_flows(x, y)
-# 
+def predict_live_capture(model_path):
+    features = CaptureToFlow().extract_feature_set_from_live_capture(timeout=10)
+    n_gram_flows = CaptureToFlow().create_n_grams_from_dataset_features(features)
+    return used_trained_model_to_predit_flow(model_path,n_gram_flows)
+
+if __name__ == "__main__":
+    # get_custom_data_from_dataset() and save to file
+    # x, y = get_n_grams_from_custom_dataset()
+    # train_network_from_classified_flows(x, y)
+    print(predict_live_capture('smallDsModel.pkl'))
+
+# # 
 
 # # make predictions
 # expected = testlabel
