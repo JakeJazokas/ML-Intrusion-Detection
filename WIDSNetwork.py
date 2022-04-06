@@ -131,7 +131,6 @@ def train_network_from_classified_flows(classified_n_gram_flows, n_gram_flow_lab
 def used_trained_model_to_predit_flow(model_path, n_gram_flows):
     n_gram_flows = np.array(n_gram_flows).reshape(n_gram_flows.shape[0], 6*4)
     model = pickle.load(open(model_path, 'rb'))
-    print(n_gram_flows)
     predictions = model.predict(n_gram_flows)
     return(predictions)
 
@@ -140,21 +139,23 @@ def predict_live_capture(model_path):
     n_gram_flows = CaptureToFlow().create_n_grams_from_observed_features(features)
     return used_trained_model_to_predit_flow(model_path,n_gram_flows)
 
+def demonstrate_model_performance():
+    featureFlow = CaptureToFlow().extract_feature_set_from_capture_path('trace.pcap')
+    print(f"Extraced Features:\n {featureFlow}\n")
+    n_gram_flows = CaptureToFlow().create_n_grams_from_observed_features(featureFlow)
+    print(f"N-Gram Flows:\n {n_gram_flows}\n")
+    predictionArray = used_trained_model_to_predit_flow('smallDsModel.pkl', n_gram_flows)
+    print(f"Predictions:\n {predictionArray}\n")
+
 if __name__ == "__main__":
+    demonstrate_model_performance()
     # get_custom_data_from_dataset() and save to file
     # x, y = get_n_grams_from_custom_dataset()
     # train_network_from_classified_flows(x, y)
     #print(predict_live_capture('smallDsModel.pkl'))
-    CaptureToFlow().generate_live_pcap('traceLive.pcap')
-    featureFlow = CaptureToFlow().extract_feature_set_from_capture_path('traceLive.pcap')
-    # print(featureFlow)
-    n_gram_flows = CaptureToFlow().create_n_grams_from_observed_features(featureFlow)
-    # print(n_gram_flows)
-    print(used_trained_model_to_predit_flow('smallDsModel.pkl', n_gram_flows))
-
+    # CaptureToFlow().generate_live_pcap('traceLive.pcap')
 
 # # 
-
 # # make predictions
 # expected = testlabel
 # predicted = model.predict(testdata)

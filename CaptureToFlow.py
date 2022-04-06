@@ -38,7 +38,8 @@ class CaptureToFlow():
                     # Epoch time
                     feature_array.append(capture.frame_info.time_epoch)
                     # Source = none
-                    feature_array.append(np.nan)
+                    # feature_array.append(np.nan)
+                    feature_array.append(0)
                     # Recieve = dst address
                     feature_array.append(capture_fields['wlan.ra'])
                     # Frame type
@@ -72,7 +73,8 @@ class CaptureToFlow():
                     feature_array.append(capture.frame_info.time_epoch)
                     # Transmit = src address
                     if(not 'wlan.ta' in capture_fields):
-                        feature_array.append(np.nan)
+                        # feature_array.append(np.nan)
+                        feature_array.append(0)
                     else:
                         feature_array.append(capture_fields['wlan.ta'])
                     # Recieve = dst address
@@ -103,7 +105,8 @@ class CaptureToFlow():
                     # Epoch time
                     feature_array.append(captrue[i].frame_info.time_epoch)
                     # Source = none
-                    feature_array.append(None)
+                    # feature_array.append(None)
+                    feature_array.append(0)
                     # Recieve = dst address
                     feature_array.append(capture_fields['wlan.ra'])
                     # Frame type
@@ -162,11 +165,11 @@ class CaptureToFlow():
         all_n_grams = []
         for feature in features:
             # Hash the MAC adresses
-            if isinstance(feature[1], float):
+            if isinstance(feature[1], float) or feature[1] == 'nan':
                 feature[1] == 0
             elif isinstance(feature[1], str):
                 feature[1] = int(feature[1].replace(":", ""), 16)
-            if isinstance(feature[2], float):
+            if isinstance(feature[2], float) or feature[2] == 'nan':
                 feature[2] == 0
             elif isinstance(feature[2], str):
                 feature[2] = int(feature[2].replace(":", ""), 16)
@@ -182,6 +185,7 @@ class CaptureToFlow():
                     four_gram_pattern.append(feature)
                     pattern_length += 1
                 # Data Frame (Type=2)
+                # TODO Fix this
                 # elif(feature[3] == '2'):
                 #     four_gram_pattern.append(feature)
                 #     pattern_length += 1
@@ -260,7 +264,7 @@ class CaptureToFlow():
             type_number = feature[2]
             feature[1] = type_subtype_hash
             # Hash the MAC adresses
-            if isinstance(feature[4], None):
+            if isinstance(feature[4], str):
                 feature[4] == 0
             elif isinstance(feature[4], str):
                 feature[4] = int(feature[4].replace(":", ""), 16)
@@ -344,9 +348,8 @@ class CaptureToFlow():
                 pattern_length = 0
         return(np.array(all_n_grams))
     
-    def generate_live_pcap(filename):
-        p = subprocess.Popen(['tcpdump', '-In', '-i', 'en0',
-                  '-w', filename], stdout=subprocess.PIPE)
+    def generate_live_pcap(self, filename):
+        p = subprocess.Popen(['tcpdump', '-In', '-i', 'en0', '-w', filename], stdout=subprocess.PIPE)
         time.sleep(10)
         p.terminate()
 
