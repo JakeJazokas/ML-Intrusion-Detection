@@ -129,8 +129,9 @@ def train_network_from_classified_flows(classified_n_gram_flows, n_gram_flow_lab
             pickle.dump(model, f)
 
 def used_trained_model_to_predit_flow(model_path, n_gram_flows):
-    print(n_gram_flows)
+    n_gram_flows = np.array(n_gram_flows).reshape(n_gram_flows.shape[0], 6*4)
     model = pickle.load(open(model_path, 'rb'))
+    print(n_gram_flows)
     predictions = model.predict(n_gram_flows)
     return(predictions)
 
@@ -145,7 +146,9 @@ if __name__ == "__main__":
     # train_network_from_classified_flows(x, y)
     #print(predict_live_capture('smallDsModel.pkl'))
     featureFlow = CaptureToFlow().extract_feature_set_from_capture_path('trace.pcap')
+    # print(featureFlow)
     n_gram_flows = CaptureToFlow().create_n_grams_from_observed_features(featureFlow)
+    # print(n_gram_flows)
     print(used_trained_model_to_predit_flow('smallDsModel.pkl', n_gram_flows))
 
 
