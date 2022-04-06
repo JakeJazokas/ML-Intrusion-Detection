@@ -2,6 +2,7 @@ import pyshark
 import time
 import numpy as np
 import pandas as pd
+import subprocess
 
 class CaptureToFlow():
 
@@ -342,6 +343,12 @@ class CaptureToFlow():
                 four_gram_pattern = []
                 pattern_length = 0
         return(np.array(all_n_grams))
+    
+    def generate_live_pcap(filename):
+        p = subprocess.Popen(['tcpdump', '-In', '-i', 'en0',
+                  '-w', filename], stdout=subprocess.PIPE)
+        time.sleep(10)
+        p.terminate()
 
     def extract_feature_set_from_live_capture(self, timeout):
         '''
