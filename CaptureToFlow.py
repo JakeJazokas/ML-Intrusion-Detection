@@ -26,9 +26,10 @@ class CaptureToFlow():
         # print(dir(captrue_array[1]['wlan']))
         # print(captrue_array[1]['wlan']._all_fields)
         for capture in captrue_array:
-            # print(capture)
-            if 'WLAN' in capture:
+            if 'WLAN' in capture and 'wlan.fc.type_subtype' in capture.wlan._all_fields:
                 capture_fields = capture.wlan._all_fields
+                # print(capture_fields)
+                capture_fields['wlan.fc.type_subtype'] = str(int(capture_fields['wlan.fc.type_subtype'], 16))
                 if(capture_fields['wlan.fc.type_subtype'] == '29'):
                     # No src address for an ACK frame only dst
                     # We want to include this in the n-gram
@@ -36,7 +37,7 @@ class CaptureToFlow():
                     # Epoch time
                     feature_array.append(capture.frame_info.time_epoch)
                     # Source = none
-                    feature_array.append(None)
+                    feature_array.append(np.nan)
                     # Recieve = dst address
                     feature_array.append(capture_fields['wlan.ra'])
                     # Frame type
@@ -69,7 +70,10 @@ class CaptureToFlow():
                     # Epoch time
                     feature_array.append(capture.frame_info.time_epoch)
                     # Transmit = src address
-                    feature_array.append(capture_fields['wlan.ta'])
+                    if(not 'wlan.ta' in capture_fields):
+                        feature_array.append(np.nan)
+                    else:
+                        feature_array.append(capture_fields['wlan.ta'])
                     # Recieve = dst address
                     feature_array.append(capture_fields['wlan.ra'])
                     # Frame type
@@ -89,7 +93,9 @@ class CaptureToFlow():
             if 'WLAN' in captrue[i]:
                 print(captrue[i])
                 capture_fields = captrue[i].wlan._all_fields
-                if(capture_fields['wlan.fc.type_subtype'] == '29'):
+                print(capture_fields['wlan.fc.type_subtype'])
+                capture_fields['wlan.fc.type_subtype'] = int(capture_fields['wlan.fc.type_subtype'], 16)
+                if(capture_fields['wlan.fc.type_subtype'] == 29):
                     # No src address for an ACK frame only dst
                     # We want to include this in the n-gram
                     feature_array = []
@@ -107,20 +113,20 @@ class CaptureToFlow():
                     feature_array.append(capture_fields['wlan.fc.type_subtype'])
                     # Add to total numpy array
                     feature_set = np.vstack((feature_set, feature_array))
-                elif(capture_fields['wlan.fc.type_subtype'] == '33'):
+                elif(capture_fields['wlan.fc.type_subtype'] == 33):
                     # Malformed packet, retransmission nessicary
                     # We don't care about these
                     continue
-                elif(capture_fields['wlan.fc.type_subtype'] == '49'):
+                elif(capture_fields['wlan.fc.type_subtype'] == 49):
                     # Fragmented frame, contains data
                     # We don't care about these currently, but we might need to
                     continue
-                elif(capture_fields['wlan.fc.type_subtype'] == '59' or capture_fields['wlan.fc.type_subtype'] == '51'
-                        or capture_fields['wlan.fc.type_subtype'] == '57' or capture_fields['wlan.fc.type_subtype'] == '55'):
+                elif(capture_fields['wlan.fc.type_subtype'] == 59 or capture_fields['wlan.fc.type_subtype'] == 51
+                        or capture_fields['wlan.fc.type_subtype'] == 57 or capture_fields['wlan.fc.type_subtype'] == 55):
                     # Unrecognized frame
                     # We don't care about these
                     continue
-                elif(capture_fields['wlan.fc.type_subtype'] == '28'):
+                elif(capture_fields['wlan.fc.type_subtype'] == 28):
                     # CTS/Clear to send frame
                     # We don't care about these currently, but we might need to
                     continue
@@ -154,6 +160,15 @@ class CaptureToFlow():
         # all_n_grams = np.empty(shape=(4,6))
         all_n_grams = []
         for feature in features:
+            # Hash the MAC adresses
+            if isinstance(feature[1], float):
+                feature[1] == 0
+            elif isinstance(feature[1], str):
+                feature[1] = int(feature[1].replace(":", ""), 16)
+            if isinstance(feature[2], float):
+                feature[2] == 0
+            elif isinstance(feature[2], str):
+                feature[2] = int(feature[2].replace(":", ""), 16)
             # Only valid start frames are: Auth, Asso Req, and Data
             if(pattern_length == 0):
                 # Authentication (Hash=11)
@@ -166,9 +181,9 @@ class CaptureToFlow():
                     four_gram_pattern.append(feature)
                     pattern_length += 1
                 # Data Frame (Type=2)
-                elif(feature[3] == '2'):
-                    four_gram_pattern.append(feature)
-                    pattern_length += 1
+                # elif(feature[3] == '2'):
+                #     four_gram_pattern.append(feature)
+                #     pattern_length += 1
             elif(pattern_length == 1):
                 # If frame 1 was Auth, next must be Auth or Asso Req
                 if(four_gram_pattern[0][5] == '11'):
@@ -220,9 +235,12 @@ class CaptureToFlow():
             elif(pattern_length == 4):
                 # Add to total and reset
                 # all_n_grams = np.vstack((all_n_grams, four_gram_pattern))
-                all_n_grams.append(four_gram_pattern)
+                all_n_grams.append(np.array(four_gram_pattern))
+                # print(all_n_grams)
                 four_gram_pattern = []
                 pattern_length = 0
+            # print(pattern_length)
+            # print(len(four_gram_pattern))
         return(np.asarray(all_n_grams))
     
     def create_n_grams_from_dataset_features(self, features):
@@ -241,7 +259,7 @@ class CaptureToFlow():
             type_number = feature[2]
             feature[1] = type_subtype_hash
             # Hash the MAC adresses
-            if isinstance(feature[4], float):
+            if isinstance(feature[4], None):
                 feature[4] == 0
             elif isinstance(feature[4], str):
                 feature[4] = int(feature[4].replace(":", ""), 16)
@@ -329,17 +347,18 @@ class CaptureToFlow():
         '''
         Implementation for live capture using MAC OSX
         '''
+        #sudo tcpdump -In -i en0 -w trace.pcap
         capture = pyshark.LiveCapture(
             interface='en0',
             monitor_mode=True, 
-            decryption_key='wifi-password', 
+            decryption_key='37272F911391:BELL397', 
             encryption_type='wpa-pwd', 
-            output_file='datadump_pyshark.pcap'
+            output_file='datadump1_pyshark.pcap'
         ) # Capture on given interfaces # NEED MONITOR MODE
         capture.set_debug()
         capture.sniff(timeout=timeout)
         capture.close()
-        return self.extract_feature_set_from_capture(self, capture)
+        return self.extract_feature_set_from_capture(capture)
 
 # f = extract_feature_set_from_capture('Wireshark_802_11.pcap')
 # n = create_n_grams_from_observed_features(f)
