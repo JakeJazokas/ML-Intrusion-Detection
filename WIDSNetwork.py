@@ -129,20 +129,25 @@ def train_network_from_classified_flows(classified_n_gram_flows, n_gram_flow_lab
             pickle.dump(model, f)
 
 def used_trained_model_to_predit_flow(model_path, n_gram_flows):
+    print(n_gram_flows)
     model = pickle.load(open(model_path, 'rb'))
     predictions = model.predict(n_gram_flows)
     return(predictions)
 
 def predict_live_capture(model_path):
     features = CaptureToFlow().extract_feature_set_from_live_capture(timeout=10)
-    n_gram_flows = CaptureToFlow().create_n_grams_from_dataset_features(features)
+    n_gram_flows = CaptureToFlow().create_n_grams_from_observed_features(features)
     return used_trained_model_to_predit_flow(model_path,n_gram_flows)
 
 if __name__ == "__main__":
     # get_custom_data_from_dataset() and save to file
     # x, y = get_n_grams_from_custom_dataset()
     # train_network_from_classified_flows(x, y)
-    print(predict_live_capture('smallDsModel.pkl'))
+    #print(predict_live_capture('smallDsModel.pkl'))
+    featureFlow = CaptureToFlow().extract_feature_set_from_capture_path('trace.pcap')
+    n_gram_flows = CaptureToFlow().create_n_grams_from_observed_features(featureFlow)
+    print(used_trained_model_to_predit_flow('smallDsModel.pkl', n_gram_flows))
+
 
 # # 
 
