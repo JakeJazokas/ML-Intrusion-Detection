@@ -1,3 +1,4 @@
+from turtle import color
 from sklearn.ensemble import AdaBoostClassifier
 from CaptureToFlow import CaptureToFlow
 import numpy as np
@@ -213,6 +214,13 @@ def generate_test_accuracy(predicted, actual):
             counter += 1
     return(counter/len(predicted))
 
+def generate_false_positives(predicted, actual):
+    fp_counter = 0
+    for idx, value in enumerate(predicted):
+        if(value == 1 and actual[idx] == 0):
+            fp_counter += 1
+    return(fp_counter/len(predicted))
+
 def generate_custom_attack_csv_files():
     get_custom_data_from_dataset("datasets\(Re)Assoc_29.csv", None, "datasets\output\AssocAttack.csv", False)
     # get_custom_data_from_dataset("datasets\Botnet_18.csv", None, "datasets\output\BotnetAttack.csv", False)
@@ -221,7 +229,8 @@ def generate_custom_attack_csv_files():
     get_custom_data_from_dataset("datasets\Evil_Twin_28.csv", None, "datasets\output\EvilTwinAttack.csv", False)
     # get_custom_data_from_dataset("datasets\Kr00k_34.csv", None, "datasets\output\Kr00kAttack.csv", False)
     get_custom_data_from_dataset("datasets\Kr00k_0.csv", None, "datasets\output\Kr00kAttack.csv", False)
-    get_custom_data_from_dataset("datasets\Krack_28.csv", None, "datasets\output\KrackAttack.csv", False)
+    # get_custom_data_from_dataset("datasets\Krack_28.csv", None, "datasets\output\KrackAttack.csv", False)
+    get_custom_data_from_dataset("datasets\Krack_27.csv", None, "datasets\output\KrackAttack.csv", False)
     get_custom_data_from_dataset("datasets\Malware_0.csv", None, "datasets\output\MalwareAttack.csv", False)
     get_custom_data_from_dataset("datasets\RogueAP_0.csv", None, "datasets\output\RougeAPAttack.csv", False)
     get_custom_data_from_dataset("datasets\SQL_Injection_0.csv", None, "datasets\output\SQLAttack.csv", False)
@@ -232,26 +241,29 @@ def generate_custom_attack_csv_files():
 def generate_attack_prediction_accuracy(model, attack_dataset):
     x, y = get_n_grams_from_custom_dataset(attack_dataset)
     predicted_values = used_trained_model_to_predit_flow(model, np.asarray(x))
-    return generate_test_accuracy(predicted_values, y)
+    return generate_test_accuracy(predicted_values, y), generate_false_positives(predicted_values, y)
 
 def generate_predictions_for_all_attacks(model):
-    p1 = generate_attack_prediction_accuracy(model, "datasets\output\AssocAttack.csv")*100
-    # p2 = generate_attack_prediction_accuracy(model, "datasets\output\BotnetAttack.csv")*100
-    p3 = generate_attack_prediction_accuracy(model, "datasets\output\DeauthAttack.csv")*100
-    p4 = generate_attack_prediction_accuracy(model, "datasets\output\DisasAttack.csv")*100
-    p5 = generate_attack_prediction_accuracy(model, "datasets\output\EvilTwinAttack.csv")*100
-    p6 = generate_attack_prediction_accuracy(model, "datasets\output\Kr00kAttack.csv")*100
-    p7 = generate_attack_prediction_accuracy(model, "datasets\output\KrackAttack.csv")*100
-    p8 = generate_attack_prediction_accuracy(model, "datasets\output\MalwareAttack.csv")*100
-    p9 = generate_attack_prediction_accuracy(model, "datasets\output\RougeAPAttack.csv")*100
-    p10 = generate_attack_prediction_accuracy(model, "datasets\output\SQLAttack.csv")*100
-    # p11 = generate_attack_prediction_accuracy(model, "datasets\output\SSDPAttack.csv")*100
-    p12 = generate_attack_prediction_accuracy(model, "datasets\output\SSHAttack.csv")*100
-    p13 = generate_attack_prediction_accuracy(model, "datasets\output\WebsiteSpoofAttack.csv")*100
-    return[p1,p3,p4,p5,p6,p7,p8,p9,p10,p12,p13]
+    p1,fp1 = generate_attack_prediction_accuracy(model, "datasets\output\AssocAttack.csv")
+    # p2 = generate_attack_prediction_accuracy(model, "datasets\output\BotnetAttack.csv")
+    p3,fp3 = generate_attack_prediction_accuracy(model, "datasets\output\DeauthAttack.csv")
+    p4,fp4 = generate_attack_prediction_accuracy(model, "datasets\output\DisasAttack.csv")
+    p5,fp5 = generate_attack_prediction_accuracy(model, "datasets\output\EvilTwinAttack.csv")
+    p6,fp6 = generate_attack_prediction_accuracy(model, "datasets\output\Kr00kAttack.csv")
+    p7,fp7 = generate_attack_prediction_accuracy(model, "datasets\output\KrackAttack.csv")
+    p8,fp8 = generate_attack_prediction_accuracy(model, "datasets\output\MalwareAttack.csv")
+    p9,fp9 = generate_attack_prediction_accuracy(model, "datasets\output\RougeAPAttack.csv")
+    p10,fp10 = generate_attack_prediction_accuracy(model, "datasets\output\SQLAttack.csv")
+    # p11 = generate_attack_prediction_accuracy(model, "datasets\output\SSDPAttack.csv")
+    p12,fp12 = generate_attack_prediction_accuracy(model, "datasets\output\SSHAttack.csv")
+    p13,fp13 = generate_attack_prediction_accuracy(model, "datasets\output\WebsiteSpoofAttack.csv")
+    return (
+        [p1*100,p3*100,p4*100,p5*100,p6*100,p7*100,p8*100,p9*100,p10*100,p12*100,p13*100], 
+        [fp1*100,fp3*100,fp4*100,fp5*100,fp6*100,fp7*100,fp8*100,fp9*100,fp10*100,fp12*100,fp13*100] 
+    )
     # return[p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13]
 
-def generate_prediction_graph(accuracy_array):
+def generate_prediction_graphs(pred_accuracy_array, false_positive_array):
     attack_names = [
         'Assoc','Deauth','Disas','EvilTwin',
         'Kr00k','Krack','Malware','RougeAP','SQL',
@@ -262,7 +274,20 @@ def generate_prediction_graph(accuracy_array):
     #     'Kr00k','Krack','Malware','RougeAP','SQL',
     #     'SSDP', 'SSH','WebsiteSpoof'
     # ]
-    plt.bar(attack_names, accuracy_array)
+    fig, ax = plt.subplots(2)
+    ax[0].set_axisbelow(True)
+    ax[0].grid(color='gray', linestyle='dashed')
+    ax[1].set_axisbelow(True)
+    ax[1].grid(color='gray', linestyle='dashed')
+    ax[0].set_title('Test accuracy % per attack')
+    ax[0].bar(attack_names, pred_accuracy_array, color=[(0, (191-(10*x))/255, 1) for x in range(12)], edgecolor='black')
+    ax[1].set_title('False Positive % per attack')
+    ax[1].bar(attack_names, false_positive_array, color=[((255-(10*x))/255, 3/255, 27/255) for x in range(12)], edgecolor='black')
+    ax[0].set_ylim([0, 100])
+    ax[1].set_ylim([0, 100])
+    ax[0].set_yticks(np.arange(0,101,10))
+    ax[1].set_yticks(np.arange(0,101,10))
+    plt.tight_layout()
     plt.show()
 
 def generate_test_train_accuracy():
@@ -280,13 +305,14 @@ if __name__ == "__main__":
     print(f"General test set accuracy: {generate_test_train_accuracy()}")
 
     # Accuracy against specific attacks
-    generate_custom_attack_csv_files()
-    attack_accuracy_array = generate_predictions_for_all_attacks('smallDsModel5000.pkl')
+    # generate_custom_attack_csv_files()
+    attack_accuracy_array, false_positives_array = generate_predictions_for_all_attacks('smallDsModel5000.pkl')
     print(f"Accuracy against specific attacks: {attack_accuracy_array}")
+    print(f"False positives for specific attacks: {false_positives_array}")
 
     # Visually display the accuracy against specific attacks
-    generate_prediction_graph(attack_accuracy_array)
-
+    generate_prediction_graphs(attack_accuracy_array, false_positives_array)
+    
     # Accuracy against live capture
     # demonstrate_model_performance()
     

@@ -279,7 +279,6 @@ class CaptureToFlow():
                     four_gram_pattern.append(feature)
                     pattern_length += 1
                 # Data Frame (Type=2)
-                # TODO Fix this -> Attack capture gets stuck here
                 elif(type_number == 2 and allowBoolean):
                     four_gram_pattern.append(feature)
                     pattern_length += 1
@@ -336,8 +335,6 @@ class CaptureToFlow():
                 all_n_grams.append(np.array(four_gram_pattern))
                 four_gram_pattern = []
                 pattern_length = 0
-            # print(four_gram_pattern)
-        # print(all_n_grams)
         if(len(all_n_grams) == 0):
             all_n_grams = self.create_n_grams_from_dataset_features(features, False)
         return(np.array(all_n_grams))
@@ -363,6 +360,8 @@ class CaptureToFlow():
         capture.sniff(timeout=timeout)
         capture.close()
         return self.extract_feature_set_from_capture(capture)
+
+# TESTING CODE BELOW
 
 # f = extract_feature_set_from_capture('Wireshark_802_11.pcap')
 # n = create_n_grams_from_observed_features(f)
