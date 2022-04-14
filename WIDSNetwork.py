@@ -5,6 +5,8 @@ import pandas as pd
 import os
 import pickle
 from CaptureToFlow import CaptureToFlow
+import matplotlib
+
 '''
 Initial input is a stream of data frames
 
@@ -21,7 +23,6 @@ Output layer of the binary classifier -> Returns 1 if abnormal, 0 otherwise
 def get_custom_data_from_dataset():
     # frame.time_epoch, wlan.ta, wlan.ra, wlan.fc.type, wlan.fc.subtype, wlan.fc.type_subtype, class
     desired_cols = [3, 77, 75, 65, 66, 63, 154]
-
     # Read specific columns of CSV file from ZIP file in resources directory
     data = pd.read_csv(
         "full_dataset.zip",
@@ -30,7 +31,6 @@ def get_custom_data_from_dataset():
         compression='zip',
         usecols=desired_cols
     )
-    
     dataset_col_name = [
         "frame.interface_id", "frame.dlt", "frame.offset_shift", "frame.time_epoch", "frame.time_delta", "frame.time_delta_displayed", 
         "frame.time_relative", "frame.len", "frame.cap_len", "frame.marked", "frame.ignored", "radiotap.version", "radiotap.pad", 
@@ -68,16 +68,12 @@ def get_custom_data_from_dataset():
         "data.len", "class"
     ]
     col_names = []
-
     for line_num, name in enumerate(dataset_col_name):
         if line_num in desired_cols:
             col_names.append(name.rstrip())
-
     # Set the column headers to the names from the Wireshark frame
     data.columns = col_names
-
     data = data.replace('?', np.nan)
-
     # Output the minimized dataset to a CSV file (with no index column added)
     data.to_csv("custom_dataset.csv", sep=',', index=False)
 
@@ -91,24 +87,16 @@ def get_n_grams_from_custom_dataset():
     all_n_gram_flows = CaptureToFlow().create_n_grams_from_dataset_features(data.values)
     classified_n_gram_flows = []
     n_gram_flow_labels = []
-
     for n_gram in all_n_gram_flows:
         label_array = n_gram[:,6]
         count = np.count_nonzero(label_array == 'normal')
         n_gram_array = np.asarray(n_gram[:,:6])
         if(count < 4):
-            # classified_n_gram_flows.append([n_gram_array, 1])
-            # classified_n_gram_flows.append(np.append(n_gram_array, 1))
             classified_n_gram_flows.append(n_gram_array)
             n_gram_flow_labels.append(1)
-            # classified_n_gram_flows.append(1)
         else:
-            # classified_n_gram_flows.append([n_gram_array, 0])    
-            # classified_n_gram_flows.append(np.append(n_gram_array, 0))
             classified_n_gram_flows.append(n_gram_array)
             n_gram_flow_labels.append(0)
-            # classified_n_gram_flows.append(0)
-    # return np.asarray(classified_n_gram_flows)
     return classified_n_gram_flows, n_gram_flow_labels
 
 def train_network_from_classified_flows(classified_n_gram_flows, n_gram_flow_labels):
@@ -120,12 +108,12 @@ def train_network_from_classified_flows(classified_n_gram_flows, n_gram_flow_lab
     # print(np.array(classified_n_gram_flows))
     # test_ngram = np.array(classified_n_gram_flows)[0].reshape(1, 6*4)
     # print(test_ngram)
-    classified_n_gram_flows = np.array(classified_n_gram_flows).reshape(9821, 6*4)
+    classified_n_gram_flows = np.array(classified_n_gram_flows).reshape(len(classified_n_gram_flows), 6*4)
     model.fit(classified_n_gram_flows, n_gram_flow_labels)
     # print(history)
     # print(model.predict(test_ngram))
-    if not os.path.exists('smallDsModel.pkl'):
-        with open('smallDsModel.pkl', 'wb') as f:
+    if not os.path.exists('smallDsModel5000.pkl'):
+        with open('smallDsModel5000.pkl', 'wb') as f:
             pickle.dump(model, f)
 
 def used_trained_model_to_predit_flow(model_path, n_gram_flows):
@@ -147,36 +135,25 @@ def demonstrate_model_performance():
     predictionArray = used_trained_model_to_predit_flow('smallDsModel.pkl', n_gram_flows)
     print(f"Predictions:\n {predictionArray}\n")
 
+def generate_accuracy_graphs(predicted, actual):
+    counter = 0
+    for idx, value in enumerate(predicted):
+        if(value == actual[idx]):
+            counter += 1
+    print(counter/len(predicted))
+
+
 if __name__ == "__main__":
-    demonstrate_model_performance()
-    # get_custom_data_from_dataset() and save to file
-    # x, y = get_n_grams_from_custom_dataset()
-    # train_network_from_classified_flows(x, y)
+    # demonstrate_model_performance()
+    # get_custom_data_from_dataset() # and save to file
+    x, y = get_n_grams_from_custom_dataset()
+    train_x = x[0:5000]
+    train_y = y[0:5000]
+    test_x = x[5000:9821]
+    test_y = y[5000:9821]
+    # Use this function below to generate the saved modle
+    # train_network_from_classified_flows(train_x, train_y) 
+    predicted_values = used_trained_model_to_predit_flow('smallDsModel5000.pkl', np.asarray(test_x))
+    generate_accuracy_graphs(predicted_values, test_y)
     #print(predict_live_capture('smallDsModel.pkl'))
     # CaptureToFlow().generate_live_pcap('traceLive.pcap')
-
-# # 
-# # make predictions
-# expected = testlabel
-# predicted = model.predict(testdata)
-# # summarize the fit of the model
-
-# cm = metrics.confusion_matrix(expected, predicted)
-# print(cm)
-# tpr = float(cm[0][0])/np.sum(cm[0])
-# fpr = float(cm[1][1])/np.sum(cm[1])
-# print("%.3f" %tpr)
-# print("%.3f" %fpr)
-# print("Accuracy")
-# print("%.3f" %accuracy)
-# print("precision")
-# print("%.3f" %precision)
-# print("recall")
-# print("%.3f" %recall)
-# print("f-score")
-# print("%.3f" %f1)
-# print("fpr")
-# print("%.3f" %fpr)
-# print("tpr")
-# print("%.3f" %tpr)
-# print("***************************************************************")

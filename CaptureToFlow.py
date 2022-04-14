@@ -264,7 +264,7 @@ class CaptureToFlow():
             type_number = feature[2]
             feature[1] = type_subtype_hash
             # Hash the MAC adresses
-            if isinstance(feature[4], str):
+            if isinstance(feature[4], float):
                 feature[4] == 0
             elif isinstance(feature[4], str):
                 feature[4] = int(feature[4].replace(":", ""), 16)
@@ -289,26 +289,22 @@ class CaptureToFlow():
                     pattern_length += 1
             elif(pattern_length == 1):
                 # If frame 1 was Auth, next must be Auth or Asso Req
-                # if(int(four_gram_pattern[0][1], 16) == 11):
                 if(four_gram_pattern[0][1] == 11):
                     if(type_subtype_hash == 11 or type_subtype_hash == 0):
                         four_gram_pattern.append(feature)
                         pattern_length += 1
                 # If frame 1 was Asso Req or Data, next must be Data
-                # elif(int(four_gram_pattern[0][1], 16) == 0 or four_gram_pattern[0][2] == 2):
                 elif(four_gram_pattern[0][1] == 0 or four_gram_pattern[0][2] == 2):
                     if(type_number == 2):
                         four_gram_pattern.append(feature)
                         pattern_length += 1
             elif(pattern_length == 2):
                 # If frame 2 was Auth, next must be Asso Req
-                # if(int(four_gram_pattern[1][1], 16) == 11):
                 if(four_gram_pattern[1][1] == 11):
                     if(type_subtype_hash == 0):
                         four_gram_pattern.append(feature)
                         pattern_length += 1
                 # If frame 2 was Asso Req, next must be Data
-                # elif(int(four_gram_pattern[1][1], 16) == 0):
                 elif(four_gram_pattern[1][1] == 0):
                     if(type_number == 2):
                         four_gram_pattern.append(feature)
@@ -320,7 +316,6 @@ class CaptureToFlow():
                         pattern_length += 1
             elif(pattern_length == 3):
                 # If frame 3 was Asso Req, last must be Data
-                # if(int(four_gram_pattern[2][1], 16) == 0):
                 if(four_gram_pattern[2][1] == 0):
                     if(type_number == 2):
                         four_gram_pattern.append(feature)
@@ -336,7 +331,6 @@ class CaptureToFlow():
                             four_gram_pattern.append(feature)
                             pattern_length += 1
                 # If frame 3 was Deauth, last must be Deauth
-                # elif(int(four_gram_pattern[2][1], 16) == 12):
                 elif(four_gram_pattern[2][1] == 12):
                     if(type_subtype_hash == 12):
                         four_gram_pattern.append(feature)
@@ -346,6 +340,7 @@ class CaptureToFlow():
                 all_n_grams.append(np.array(four_gram_pattern))
                 four_gram_pattern = []
                 pattern_length = 0
+        # print(all_n_grams)
         return(np.array(all_n_grams))
     
     def generate_live_pcap(self, filename):
