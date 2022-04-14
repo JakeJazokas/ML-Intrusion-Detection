@@ -1,3 +1,4 @@
 custom_dataset.csv
 full_dataset.zip
 /__pycache__/
+/datasets/
