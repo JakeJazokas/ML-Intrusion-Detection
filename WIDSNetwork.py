@@ -1,5 +1,5 @@
-from turtle import color
-from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
 from CaptureToFlow import CaptureToFlow
 import numpy as np
 import pandas as pd
@@ -188,6 +188,24 @@ def train_network_from_classified_flows(classified_n_gram_flows, n_gram_flow_lab
         with open('smallDsModel5000.pkl', 'wb') as f:
             pickle.dump(model, f)
 
+def train_network2_from_classified_flows(classified_n_gram_flows, n_gram_flow_labels):
+    model = RandomForestClassifier(n_estimators=100)
+    classified_n_gram_flows = np.array(classified_n_gram_flows).reshape(len(classified_n_gram_flows), 6*4)
+    model.fit(classified_n_gram_flows, n_gram_flow_labels)
+    # Save the trained model to a file
+    if not os.path.exists('smallDsModel5000-Random.pkl'):
+        with open('smallDsModel5000-Random.pkl', 'wb') as f:
+            pickle.dump(model, f)
+
+def train_network3_from_classified_flows(classified_n_gram_flows, n_gram_flow_labels):
+    model = DecisionTreeClassifier()
+    classified_n_gram_flows = np.array(classified_n_gram_flows).reshape(len(classified_n_gram_flows), 6*4)
+    model.fit(classified_n_gram_flows, n_gram_flow_labels)
+    # Save the trained model to a file
+    if not os.path.exists('smallDsModel5000-Tree.pkl'):
+        with open('smallDsModel5000-Tree.pkl', 'wb') as f:
+            pickle.dump(model, f)
+
 def used_trained_model_to_predit_flow(model_path, n_gram_flows):
     n_gram_flows = np.array(n_gram_flows).reshape(n_gram_flows.shape[0], 6*4)
     model = pickle.load(open(model_path, 'rb'))
@@ -289,25 +307,35 @@ def generate_prediction_graphs(pred_accuracy_array, false_positive_array):
     ax[1].set_yticks(np.arange(0,101,10))
     plt.tight_layout()
     # plt.show()
-    plt.savefig('ResultsGraphs.png', dpi=300)
+    plt.savefig('ResultsGraphs2.png') # change depending on model
 
-def generate_test_train_accuracy():
+def generate_test_train_accuracy(model):
     x, y = get_n_grams_from_custom_dataset('custom_dataset.csv')
     test_x = x[5000:9821]
     test_y = y[5000:9821]
-    predicted_values = used_trained_model_to_predit_flow('smallDsModel5000.pkl', np.asarray(test_x))
+    predicted_values = used_trained_model_to_predit_flow(model, np.asarray(test_x))
     return(generate_test_accuracy(predicted_values, test_y)*100)
 
 if __name__ == "__main__":
-    # Use this function below to generate and save the trained modle
+    # Get ngrams from the total dataset
+    # x, y = get_n_grams_from_custom_dataset('custom_dataset.csv')
+    # train_x = x[0:5000]
+    # train_y = y[0:5000]
+
+    # Use the functions below to generate and save the trained models
     # train_network_from_classified_flows(train_x, train_y) 
+    # train_network2_from_classified_flows(train_x, train_y)
+    # train_network3_from_classified_flows(train_x, train_y)
+
+    # Change depending on the model
+    model_name = 'smallDsModel5000-Random.pkl'
 
     # General accuracy on data
-    print(f"General test set accuracy: {generate_test_train_accuracy()}")
+    print(f"General test set accuracy: {generate_test_train_accuracy(model_name)}")
 
     # Accuracy against specific attacks
     # generate_custom_attack_csv_files()
-    attack_accuracy_array, false_positives_array = generate_predictions_for_all_attacks('smallDsModel5000.pkl')
+    attack_accuracy_array, false_positives_array = generate_predictions_for_all_attacks(model_name)
     print(f"Accuracy against specific attacks: {attack_accuracy_array}")
     print(f"False positives for specific attacks: {false_positives_array}")
 
