@@ -47,7 +47,6 @@ def calculate_data_frames_in_flow(n_gram_flow):
 if __name__ == "__main__":
     featureFlow = CaptureToFlow().extract_feature_set_from_capture_path('Wireshark_802_11.pcap')
     hahsedFeatureFlow = CaptureToFlow().hash_observation_features(featureFlow)
-
     # f = extract_feature_set_from_capture('Wireshark_802_11.pcap')
     # n = create_n_grams_from_observed_features(f)
     # print(n)
