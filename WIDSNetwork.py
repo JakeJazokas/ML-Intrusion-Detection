@@ -274,7 +274,7 @@ def generate_prediction_graphs(pred_accuracy_array, false_positive_array):
     #     'Kr00k','Krack','Malware','RougeAP','SQL',
     #     'SSDP', 'SSH','WebsiteSpoof'
     # ]
-    fig, ax = plt.subplots(2)
+    fig, ax = plt.subplots(2, figsize=(13,9))
     ax[0].set_axisbelow(True)
     ax[0].grid(color='gray', linestyle='dashed')
     ax[1].set_axisbelow(True)
@@ -288,7 +288,8 @@ def generate_prediction_graphs(pred_accuracy_array, false_positive_array):
     ax[0].set_yticks(np.arange(0,101,10))
     ax[1].set_yticks(np.arange(0,101,10))
     plt.tight_layout()
-    plt.show()
+    # plt.show()
+    plt.savefig('ResultsGraphs.png', dpi=300)
 
 def generate_test_train_accuracy():
     x, y = get_n_grams_from_custom_dataset('custom_dataset.csv')
