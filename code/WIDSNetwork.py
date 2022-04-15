@@ -1,4 +1,5 @@
 import matplotlib
+import time
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from CaptureToFlow import CaptureToFlow
@@ -185,8 +186,8 @@ def train_network_from_classified_flows(classified_n_gram_flows, n_gram_flow_lab
     classified_n_gram_flows = np.array(classified_n_gram_flows).reshape(len(classified_n_gram_flows), 6*4)
     model.fit(classified_n_gram_flows, n_gram_flow_labels)
     # Save the trained model to a file
-    if not os.path.exists('smallDsModel5000.pkl'):
-        with open('smallDsModel5000.pkl', 'wb') as f:
+    if not os.path.exists('trained-models/smallDsModel5000.pkl'):
+        with open('trained-models/smallDsModel5000.pkl', 'wb') as f:
             pickle.dump(model, f)
 
 def train_network2_from_classified_flows(classified_n_gram_flows, n_gram_flow_labels):
@@ -194,11 +195,12 @@ def train_network2_from_classified_flows(classified_n_gram_flows, n_gram_flow_la
     classified_n_gram_flows = np.array(classified_n_gram_flows).reshape(len(classified_n_gram_flows), 6*4)
     model.fit(classified_n_gram_flows, n_gram_flow_labels)
     # Save the trained model to a file
-    if not os.path.exists('smallDsModel5000-Random.pkl'):
-        with open('smallDsModel5000-Random.pkl', 'wb') as f:
+    if not os.path.exists('trained-models/smallDsModel5000-Random.pkl'):
+        with open('trained-models/smallDsModel5000-Random.pkl', 'wb') as f:
             pickle.dump(model, f)
 
 def train_network3_from_classified_flows(classified_n_gram_flows, n_gram_flow_labels):
+    # In ResultsGraph3 -> NOT NEEDED
     model = DecisionTreeClassifier()
     classified_n_gram_flows = np.array(classified_n_gram_flows).reshape(len(classified_n_gram_flows), 6*4)
     model.fit(classified_n_gram_flows, n_gram_flow_labels)
@@ -218,13 +220,18 @@ def predict_live_capture(model_path):
     n_gram_flows = CaptureToFlow().create_n_grams_from_observed_features(features)
     return used_trained_model_to_predit_flow(model_path,n_gram_flows)
 
-def demonstrate_model_performance():
-    featureFlow = CaptureToFlow().extract_feature_set_from_capture_path('trace.pcap')
-    print(f"Extraced Features:\n {featureFlow}\n")
+def demonstrate_model_performance(noPrint):
+    start_time = time.time() # Check how long for extraction time
+    featureFlow = CaptureToFlow().extract_feature_set_from_capture_path('results/trace.pcap')
+    if not noPrint: print(f"Extraced Features:\n {featureFlow}\n")
     n_gram_flows = CaptureToFlow().create_n_grams_from_observed_features(featureFlow)
-    print(f"N-Gram Flows:\n {n_gram_flows}\n")
-    predictionArray = used_trained_model_to_predit_flow('smallDsModel.pkl', n_gram_flows)
-    print(f"Predictions:\n {predictionArray}\n")
+    if not noPrint: print(f"N-Gram Flows:\n {n_gram_flows}\n")
+    print("Extraction time: --- %s seconds ---" % (time.time() - start_time))
+    start_time2 = time.time() # Check how long for extraction time
+    predictionArray = used_trained_model_to_predit_flow('trained-models/smallDsModel5000.pkl', n_gram_flows)
+    print("Detection time: --- %s seconds ---" % (time.time() - start_time2))
+    if not noPrint: print(f"Predictions:\n {predictionArray}\n")
+    return predictionArray
 
 def generate_test_accuracy(predicted, actual):
     counter = 0
@@ -301,6 +308,7 @@ def generate_prediction_graphs(pred_accuracy_array, false_positive_array, true_p
     # Plots
     fig = plt.figure()
     fig.set_figwidth(13)
+    fig.set_figheight(10)
     gs = fig.add_gridspec(2,2)
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[0, 1])
@@ -349,7 +357,7 @@ if __name__ == "__main__":
     # train_network3_from_classified_flows(train_x, train_y)
 
     # Change depending on the model
-    model_name = 'smallDsModel5000-Random.pkl'
+    model_name = 'trained-models/smallDsModel5000-Random.pkl'
 
     # General accuracy on data
     print(f"General test set accuracy: {generate_test_train_accuracy(model_name)}")
@@ -365,5 +373,5 @@ if __name__ == "__main__":
     generate_prediction_graphs(attack_accuracy_array, false_positives_array, true_positives_array)
     
     # Accuracy against live capture
-    # demonstrate_model_performance()
+    # print(demonstrate_model_performance(True))
     

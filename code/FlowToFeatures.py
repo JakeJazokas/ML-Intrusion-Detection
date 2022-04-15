@@ -4,7 +4,6 @@ from CaptureToFlow import CaptureToFlow
 # 1) Flow Probability - Jelinek-Mercer smoothing model - (Lambda = 0.5)
 def calculate_flow_probability(n_gram, n_gram_flow):
     # Determine P(n_gram|n_gram_flow) -> We assume all n grams are of size 4
-    # Maybe a useful link: https://github.com/scikit-learn/scikit-learn/issues/12862
     return 1
 
 # 2) Total Frames in Flow (Each n-gram flow is made up of 4 frames)
@@ -24,7 +23,7 @@ def calculate_management_frames_in_flow(n_gram_flow):
                 management_frame_counter += 1
     return(management_frame_counter/calculate_total_frames_in_flow(n_gram_flow))
 
-# 5) Ratio of number of control frames to total frames TODO Frames other than Asso Reqs
+# 5) Ratio of number of control frames to total frames (Asso Reqs)
 def calculate_control_frames_in_flow(n_gram_flow):
     control_frame_counter = 0
     for n_gram in n_gram_flow:

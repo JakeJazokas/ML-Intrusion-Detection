@@ -184,7 +184,7 @@ class CaptureToFlow():
                     four_gram_pattern.append(feature)
                     pattern_length += 1
                 # Data Frame (Type=2)
-                # TODO Fix this -> Live capture gets stuck here
+                # -> Live capture gets stuck here
                 # elif(feature[3] == '2'):
                 #     four_gram_pattern.append(feature)
                 #     pattern_length += 1
