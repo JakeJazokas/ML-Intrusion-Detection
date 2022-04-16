@@ -186,8 +186,8 @@ def train_network_from_classified_flows(classified_n_gram_flows, n_gram_flow_lab
     classified_n_gram_flows = np.array(classified_n_gram_flows).reshape(len(classified_n_gram_flows), 6*4)
     model.fit(classified_n_gram_flows, n_gram_flow_labels)
     # Save the trained model to a file
-    if not os.path.exists('trained-models/smallDsModel5000.pkl'):
-        with open('trained-models/smallDsModel5000.pkl', 'wb') as f:
+    if not os.path.exists(r'trained-models\smallDsModel5000.pkl'):
+        with open(r'trained-models\smallDsModel5000.pkl', 'wb') as f:
             pickle.dump(model, f)
 
 def train_network2_from_classified_flows(classified_n_gram_flows, n_gram_flow_labels):
@@ -195,8 +195,8 @@ def train_network2_from_classified_flows(classified_n_gram_flows, n_gram_flow_la
     classified_n_gram_flows = np.array(classified_n_gram_flows).reshape(len(classified_n_gram_flows), 6*4)
     model.fit(classified_n_gram_flows, n_gram_flow_labels)
     # Save the trained model to a file
-    if not os.path.exists('trained-models/smallDsModel5000-Random.pkl'):
-        with open('trained-models/smallDsModel5000-Random.pkl', 'wb') as f:
+    if not os.path.exists(r'trained-models\smallDsModel5000-Random.pkl'):
+        with open(r'trained-models\smallDsModel5000-Random.pkl', 'wb') as f:
             pickle.dump(model, f)
 
 def train_network3_from_classified_flows(classified_n_gram_flows, n_gram_flow_labels):
@@ -222,13 +222,13 @@ def predict_live_capture(model_path):
 
 def demonstrate_model_performance(noPrint):
     start_time = time.time() # Check how long for extraction time
-    featureFlow = CaptureToFlow().extract_feature_set_from_capture_path('results/trace.pcap')
+    featureFlow = CaptureToFlow().extract_feature_set_from_capture_path(r'results\trace.pcap')
     if not noPrint: print(f"Extraced Features:\n {featureFlow}\n")
     n_gram_flows = CaptureToFlow().create_n_grams_from_observed_features(featureFlow)
     if not noPrint: print(f"N-Gram Flows:\n {n_gram_flows}\n")
     print("Extraction time: --- %s seconds ---" % (time.time() - start_time))
     start_time2 = time.time() # Check how long for extraction time
-    predictionArray = used_trained_model_to_predit_flow('trained-models/smallDsModel5000.pkl', n_gram_flows)
+    predictionArray = used_trained_model_to_predit_flow(r'trained-models\smallDsModel5000.pkl', n_gram_flows)
     print("Detection time: --- %s seconds ---" % (time.time() - start_time2))
     if not noPrint: print(f"Predictions:\n {predictionArray}\n")
     return predictionArray
@@ -255,21 +255,21 @@ def generate_true_positives(predicted, actual):
     return(tp_counter/len(predicted))
 
 def generate_custom_attack_csv_files():
-    get_custom_data_from_dataset("datasets\(Re)Assoc_29.csv", None, "datasets\output\AssocAttack.csv", False)
-    get_custom_data_from_dataset("datasets\Botnet_18.csv", None, "datasets\output\BotnetAttack.csv", False)
-    get_custom_data_from_dataset("datasets\Deauth_22.csv", None, "datasets\output\DeauthAttack.csv", False)
-    get_custom_data_from_dataset("datasets\Disas_38.csv", None, "datasets\output\DisasAttack.csv", False)
-    get_custom_data_from_dataset("datasets\Evil_Twin_28.csv", None, "datasets\output\EvilTwinAttack.csv", False)
-    # get_custom_data_from_dataset("datasets\Kr00k_34.csv", None, "datasets\output\Kr00kAttack.csv", False)
-    get_custom_data_from_dataset("datasets\Kr00k_0.csv", None, "datasets\output\Kr00kAttack.csv", False)
-    # get_custom_data_from_dataset("datasets\Krack_28.csv", None, "datasets\output\KrackAttack.csv", False)
-    get_custom_data_from_dataset("datasets\Krack_27.csv", None, "datasets\output\KrackAttack.csv", False)
-    get_custom_data_from_dataset("datasets\Malware_0.csv", None, "datasets\output\MalwareAttack.csv", False)
-    get_custom_data_from_dataset("datasets\RogueAP_0.csv", None, "datasets\output\RougeAPAttack.csv", False)
-    get_custom_data_from_dataset("datasets\SQL_Injection_0.csv", None, "datasets\output\SQLAttack.csv", False)
-    get_custom_data_from_dataset("datasets\SSDP_18.csv", None, "datasets\output\SSDPAttack.csv", False)
-    get_custom_data_from_dataset("datasets\SSH_0.csv", None, "datasets\output\SSHAttack.csv", False)
-    get_custom_data_from_dataset("datasets\Website_spoofing_0.csv", None, "datasets\output\WebsiteSpoofAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\(Re)Assoc_29.csv", None, r"datasets\output\AssocAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\Botnet_18.csv", None, r"datasets\output\BotnetAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\Deauth_22.csv", None, r"datasets\output\DeauthAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\Disas_38.csv", None, r"datasets\output\DisasAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\Evil_Twin_28.csv", None, r"datasets\output\EvilTwinAttack.csv", False)
+    # get_custom_data_from_dataset(r"datasets\Kr00k_34.csv", None, r"datasets\output\Kr00kAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\Kr00k_0.csv", None, r"datasets\output\Kr00kAttack.csv", False)
+    # get_custom_data_from_dataset(r"datasets\Krack_28.csv", None, r"datasets\output\KrackAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\Krack_27.csv", None, r"datasets\output\KrackAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\Malware_0.csv", None, r"datasets\output\MalwareAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\RogueAP_0.csv", None, r"datasets\output\RougeAPAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\SQL_Injection_0.csv", None, r"datasets\output\SQLAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\SSDP_18.csv", None, r"datasets\output\SSDPAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\SSH_0.csv", None, r"datasets\output\SSHAttack.csv", False)
+    get_custom_data_from_dataset(r"datasets\Website_spoofing_0.csv", None, r"datasets\output\WebsiteSpoofAttack.csv", False)
 
 def generate_attack_prediction_accuracy(model, attack_dataset):
     x, y = get_n_grams_from_custom_dataset(attack_dataset)
@@ -277,19 +277,19 @@ def generate_attack_prediction_accuracy(model, attack_dataset):
     return generate_test_accuracy(predicted_values, y), generate_false_positives(predicted_values, y), generate_true_positives(predicted_values, y)
 
 def generate_predictions_for_all_attacks(model):
-    p1,fp1,tp1 = generate_attack_prediction_accuracy(model, "datasets\output\AssocAttack.csv")
-    p2,fp2,tp2 = generate_attack_prediction_accuracy(model, "datasets\output\BotnetAttack.csv")
-    p3,fp3,tp3 = generate_attack_prediction_accuracy(model, "datasets\output\DeauthAttack.csv")
-    p4,fp4,tp4 = generate_attack_prediction_accuracy(model, "datasets\output\DisasAttack.csv")
-    p5,fp5,tp5 = generate_attack_prediction_accuracy(model, "datasets\output\EvilTwinAttack.csv")
-    p6,fp6,tp6 = generate_attack_prediction_accuracy(model, "datasets\output\Kr00kAttack.csv")
-    p7,fp7,tp7 = generate_attack_prediction_accuracy(model, "datasets\output\KrackAttack.csv")
-    p8,fp8,tp8 = generate_attack_prediction_accuracy(model, "datasets\output\MalwareAttack.csv")
-    p9,fp9,tp9 = generate_attack_prediction_accuracy(model, "datasets\output\RougeAPAttack.csv")
-    p10,fp10,tp10 = generate_attack_prediction_accuracy(model, "datasets\output\SQLAttack.csv")
-    p11,fp11,tp11 = generate_attack_prediction_accuracy(model, "datasets\output\SSDPAttack.csv")
-    p12,fp12,tp12 = generate_attack_prediction_accuracy(model, "datasets\output\SSHAttack.csv")
-    p13,fp13,tp13 = generate_attack_prediction_accuracy(model, "datasets\output\WebsiteSpoofAttack.csv")
+    p1,fp1,tp1 = generate_attack_prediction_accuracy(model, r"datasets\output\AssocAttack.csv")
+    p2,fp2,tp2 = generate_attack_prediction_accuracy(model, r"datasets\output\BotnetAttack.csv")
+    p3,fp3,tp3 = generate_attack_prediction_accuracy(model, r"datasets\output\DeauthAttack.csv")
+    p4,fp4,tp4 = generate_attack_prediction_accuracy(model, r"datasets\output\DisasAttack.csv")
+    p5,fp5,tp5 = generate_attack_prediction_accuracy(model, r"datasets\output\EvilTwinAttack.csv")
+    p6,fp6,tp6 = generate_attack_prediction_accuracy(model, r"datasets\output\Kr00kAttack.csv")
+    p7,fp7,tp7 = generate_attack_prediction_accuracy(model, r"datasets\output\KrackAttack.csv")
+    p8,fp8,tp8 = generate_attack_prediction_accuracy(model, r"datasets\output\MalwareAttack.csv")
+    p9,fp9,tp9 = generate_attack_prediction_accuracy(model, r"datasets\output\RougeAPAttack.csv")
+    p10,fp10,tp10 = generate_attack_prediction_accuracy(model, r"datasets\output\SQLAttack.csv")
+    p11,fp11,tp11 = generate_attack_prediction_accuracy(model, r"datasets\output\SSDPAttack.csv")
+    p12,fp12,tp12 = generate_attack_prediction_accuracy(model, r"datasets\output\SSHAttack.csv")
+    p13,fp13,tp13 = generate_attack_prediction_accuracy(model, r"datasets\output\WebsiteSpoofAttack.csv")
     return (
         [p1*100,p2*100,p3*100,p4*100,p5*100,p6*100,p7*100,p8*100,p9*100,p10*100,p11*100,p12*100,p13*100], 
         [fp1*100,fp2*100,fp3*100,fp4*100,fp5*100,fp6*100,fp7*100,fp8*100,fp9*100,fp11*100,fp10*100,fp12*100,fp13*100],
@@ -336,10 +336,10 @@ def generate_prediction_graphs(pred_accuracy_array, false_positive_array, true_p
     ax2.set_yticks(np.arange(0,101,10))
     plt.tight_layout()
     # plt.show()
-    plt.savefig('ResultsGraphs2.png') # change depending on model
+    plt.savefig('ResultsGraphs2.png') # change depending on model (currently random forest)
 
 def generate_test_train_accuracy(model):
-    x, y = get_n_grams_from_custom_dataset('custom_dataset.csv')
+    x, y = get_n_grams_from_custom_dataset(r'training\custom_dataset.csv') # Not included as it is a large file
     test_x = x[5000:9821]
     test_y = y[5000:9821]
     predicted_values = used_trained_model_to_predit_flow(model, np.asarray(test_x))
@@ -347,30 +347,30 @@ def generate_test_train_accuracy(model):
 
 if __name__ == "__main__":
     # Get ngrams from the total dataset
-    # x, y = get_n_grams_from_custom_dataset('custom_dataset.csv')
-    # train_x = x[0:5000]
-    # train_y = y[0:5000]
+    x, y = get_n_grams_from_custom_dataset(r'training\custom_dataset.csv')
+    train_x = x[0:5000]
+    train_y = y[0:5000]
 
     # Use the functions below to generate and save the trained models
     # train_network_from_classified_flows(train_x, train_y) 
-    # train_network2_from_classified_flows(train_x, train_y)
+    train_network2_from_classified_flows(train_x, train_y) # This one is Random Forest
     # train_network3_from_classified_flows(train_x, train_y)
 
     # Change depending on the model
-    model_name = 'trained-models/smallDsModel5000-Random.pkl'
+    model_name = r'trained-models\smallDsModel5000-Random.pkl'
 
     # General accuracy on data
     print(f"General test set accuracy: {generate_test_train_accuracy(model_name)}")
 
     # Accuracy against specific attacks
     # generate_custom_attack_csv_files()
-    attack_accuracy_array, false_positives_array, true_positives_array = generate_predictions_for_all_attacks(model_name)
-    print(f"Accuracy against specific attacks: {attack_accuracy_array}")
-    print(f"False positives for specific attacks: {false_positives_array}")
-    print(f"True positives for specific attacks: {true_positives_array}")
+    # attack_accuracy_array, false_positives_array, true_positives_array = generate_predictions_for_all_attacks(model_name)
+    # print(f"Accuracy against specific attacks: {attack_accuracy_array}")
+    # print(f"False positives for specific attacks: {false_positives_array}")
+    # print(f"True positives for specific attacks: {true_positives_array}")
 
     # Visually display the accuracy against specific attacks
-    generate_prediction_graphs(attack_accuracy_array, false_positives_array, true_positives_array)
+    # generate_prediction_graphs(attack_accuracy_array, false_positives_array, true_positives_array)
     
     # Accuracy against live capture
     # print(demonstrate_model_performance(True))
