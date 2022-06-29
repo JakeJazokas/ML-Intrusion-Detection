@@ -1,4 +1,4 @@
-# Intrusion Detection for Wireless Networks using Machine Learning
+# Intrusion Detection for Wifi Networks using Machine Learning
 
 **Presentation Video**\
 https://youtu.be/X9NMJFhzqqQ
