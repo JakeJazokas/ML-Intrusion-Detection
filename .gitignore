@@ -1,4 +1,7 @@
 custom_dataset.csv
 full_dataset.zip
+4203-Intrusion-Detection-Project.zip
 /__pycache__/
 /datasets/
+/datasets/output/
+/code/__pycache__/
